@@ -15,7 +15,7 @@ namespace ChatVrite
         public MainWindow()
         {
             InitializeComponent();
-            CheckDbConnection();
+            //CheckDbConnection();
 
             if (SessionManager.IsUserAuthenticated())
             {
@@ -34,7 +34,7 @@ namespace ChatVrite
                 {
                     connection.Open();
                     // Если подключение успешно, можно выполнить дополнительные действия или просто вывести сообщение об успешном подключении.
-                    //MessageBox.Show("Соединение с базой данных установлено!");
+                    MessageBox.Show("Соединение с базой данных установлено!");
                 }
                 catch (MySqlException ex)
                 {
@@ -49,18 +49,6 @@ namespace ChatVrite
             string password = LoginPassword.Password;
             PasswordHashing hasher = new PasswordHashing();
             string hashedPassword = hasher.HashPassword(password);
-
-            switch(password)
-            {
-                case "a":
-                        hashedPassword = "a";
-                    break;
-                case "b":
-                        hashedPassword = "b";
-                    break;
-                default:
-                    break;
-            }
 
             using (MySqlConnection connection = new MySqlConnection(DbConnection))
             {
@@ -193,31 +181,39 @@ namespace ChatVrite
 
                             if (enteredCode == verificationCode)
                             {
-                                using (MySqlCommand command = new MySqlCommand("INSERT INTO Users (Username, Email, Password, DateOfRegistration, Birthday, City, Status) VALUES (@username, @email, @password, @registrationDate, @birthday, @city, @status)", connection))
+                                try
                                 {
-                                    command.Parameters.AddWithValue("@username", username);
-                                    command.Parameters.AddWithValue("@email", email);
-                                    command.Parameters.AddWithValue("@password", hashedPassword);
-                                    command.Parameters.AddWithValue("@registrationDate", DateTime.Now);
-                                    command.Parameters.AddWithValue("@birthday", DBNull.Value);
-                                    command.Parameters.AddWithValue("@city", DBNull.Value);
-                                    command.Parameters.AddWithValue("@status", DBNull.Value);
-
-                                    int rowsInserted = command.ExecuteNonQuery();
-
-                                    if (rowsInserted > 0)
+                                    using (MySqlCommand command = new MySqlCommand("INSERT INTO Users (Username, Email, Password, DateOfRegistration, Birthday, City, Status) VALUES (@username, @email, @password, @registrationDate, @birthday, @city, @status)", connection))
                                     {
-                                        MessageBox.Show("Регистрация выполнена успешно!");
-                                        tabcon.SelectedIndex = 0;
-                                        LoginEmail.Text = email;
-                                        LoginPassword.Focus();
+                                        command.Parameters.AddWithValue("@username", username);
+                                        command.Parameters.AddWithValue("@email", email);
+                                        command.Parameters.AddWithValue("@password", hashedPassword);
+                                        command.Parameters.AddWithValue("@registrationDate", DateTime.Now);
+                                        command.Parameters.AddWithValue("@birthday", DBNull.Value);
+                                        command.Parameters.AddWithValue("@city", DBNull.Value);
+                                        command.Parameters.AddWithValue("@status", DBNull.Value);
 
-                                    }
-                                    else
-                                    {
-                                        MessageBox.Show("Регистрация не выполнена. Пожалуйста, попробуйте еще раз.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                                        int rowsInserted = command.ExecuteNonQuery();
+
+                                        if (rowsInserted > 0)
+                                        {
+                                            MessageBox.Show("Регистрация выполнена успешно!");
+                                            tabcon.SelectedIndex = 0;
+                                            LoginEmail.Text = email;
+                                            LoginPassword.Focus();
+
+                                        }
+                                        else
+                                        {
+                                            MessageBox.Show("Регистрация не выполнена. Пожалуйста, попробуйте еще раз.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                                        }
                                     }
                                 }
+                                catch (Exception ex)
+                                {
+                                    MessageBox.Show($"Регистрация не выполнена. Пожалуйста, попробуйте еще раз. {ex}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                                }
+
                             }
                             else
                             {

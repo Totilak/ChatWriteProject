@@ -9,8 +9,8 @@ namespace ChatVrite
 {
     public partial class PersonalWindow : Window
     {
-        string name;
-        private const string DbConnection = "server=45.93.200.175; port=3306; username=toti; password=Toti345; database=pi";
+       public string name;
+        public const string DbConnection = "server=45.93.200.175; port=3306; username=toti; password=Toti345; database=pi";
 
         public PersonalWindow(string userName)
         {
@@ -18,6 +18,8 @@ namespace ChatVrite
             name = userName;
             try
             {LoadUserDataFromDatabase();}catch (Exception ex){ UserNameLabel.Text = "Привет, " + userName + "!"; }
+            
+
 
             // Установить имя пользователя и дополнительные данные
             //
@@ -34,6 +36,45 @@ namespace ChatVrite
         {
             // Здесь выполните загрузку данных после обновления профиля
             LoadUserDataFromDatabase();
+        }
+
+        private void EditConditionStatusInBaseTry(bool condition)
+        {
+            try
+            {
+                EditConditionsStatusInBase(condition);
+              //  MessageBox.Show($"Успешно установили статус на  {condition}!");
+
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка смены статуса. {ex}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        void EditConditionsStatusInBase(bool condition)
+        {
+            string ConditionString;
+            if(condition)
+            {
+                ConditionString = "Online";
+            }
+            else
+            {
+                ConditionString = DateTime.Now.ToString();
+            }
+            using (MySqlConnection connection = new MySqlConnection(DbConnection))
+            {
+                    connection.Open();
+                    string query = "UPDATE `Users` SET `Сondition` = @Condition WHERE `Users`.`Username` =@UserName";
+                    using (MySqlCommand command = new MySqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@UserName", name);
+                        command.Parameters.AddWithValue("@Condition", ConditionString);
+                        command.ExecuteNonQuery();
+                    }
+            }
         }
 
         private void Exit_Click(object sender, RoutedEventArgs e)
@@ -90,6 +131,16 @@ namespace ChatVrite
             mainWindow.Show();
             this.Close();
 
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            EditConditionStatusInBaseTry(false);
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            EditConditionStatusInBaseTry(true);
         }
     }
 }

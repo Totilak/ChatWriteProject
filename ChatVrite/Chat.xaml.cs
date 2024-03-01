@@ -8,6 +8,7 @@ using System.Threading;
 using System.Collections.Generic;
 using System.Windows.Documents;
 using System.Media;
+using System.Windows.Shapes;
 
 namespace ChatVrite
 {
@@ -80,6 +81,7 @@ namespace ChatVrite
         //%Loaded/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            EditConditionStatusInBaseTry(true);
             List<User> users = GetUsersFromDatabase();
 
             Style buttonStyle = this.FindResource("btnuser") as Style;
@@ -127,7 +129,16 @@ namespace ChatVrite
             isChatActive = true;
 
             receiverName = GetReceiverUserNameFromDialog(receiverUserId);
-            reciv.Text = receiverName;//Имя сверху
+            string condition = GetConditionFromBD(receiverName);
+            if(condition!="Online")
+            {
+                condition = "| Был в сети " + condition;
+            }
+            else
+            {
+                condition = "| В сети!";
+            }
+            reciv.Text = receiverName + " "+condition ;//Имя сверху
 
             int msgCount = GetUnreadMessageCount(currentUserId, receiverUserId);
             userButton.Content = CreateUserButtonContent(receiverName, msgCount);
@@ -184,12 +195,68 @@ namespace ChatVrite
                 }
             }
         }
+        string GetConditionFromBD(string usrname)
+        {
+            try
+            {
+                string condition = null;
+                using (MySqlConnection connection = new MySqlConnection(DbConnection))
+                {
+                    connection.Open();
+                    using (MySqlCommand command = new MySqlCommand("SELECT * FROM Users WHERE Username = @name ", connection))
+                    {
+                        command.Parameters.AddWithValue("@name", usrname);
 
+                        using (MySqlDataReader reader = command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                condition = reader["Сondition"].ToString();
+
+                            }
+                            else
+                            {
+                                MessageBox.Show("Ошибка чтения.");
+
+                            }
+                        }
+                    }
+                }
+
+                return condition;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+                return null;
+            }
+           
+        }
         private StackPanel CreateUserButtonContent(string userName, int msgCount)
         {
             TextBlock userNameTextBlock = new TextBlock();
-            userNameTextBlock.Inlines.Add(new Run(userName + "   "));
+            string condition = GetConditionFromBD(userName);
             userNameTextBlock.FontSize = 30;
+
+            // Создаем блок для отображения символа с заданным цветом
+            TextBlock iconBlock = new TextBlock();
+            iconBlock.FontSize = 20;
+            iconBlock.VerticalAlignment = VerticalAlignment.Center;
+
+            if (condition == "Online")
+            {
+                iconBlock.Text = "\u2714"; // Галочка
+                iconBlock.Foreground = Brushes.Green;
+            }
+            else
+            {
+                iconBlock.Text = "\u2716"; // Крестик
+                iconBlock.Foreground = Brushes.Red;
+            }
+
+            // Добавляем имя пользователя и иконку в текстовый блок
+            userNameTextBlock.Text = $" {userName} ";
+            userNameTextBlock.Inlines.Add(iconBlock);
 
             if (msgCount <= 0)
             {
@@ -204,7 +271,7 @@ namespace ChatVrite
                 Border unreadMessagesBorder = new Border
                 {
                     Background = new SolidColorBrush(Color.FromRgb(58, 106, 235)),
-                CornerRadius = new CornerRadius(7),
+                    CornerRadius = new CornerRadius(7),
                     Padding = new Thickness(5),
                     Child = new TextBlock
                     {
@@ -217,10 +284,12 @@ namespace ChatVrite
                 return new StackPanel
                 {
                     Orientation = Orientation.Horizontal,
-                    Children = { userNameTextBlock, unreadMessagesBorder }
+                    Children = { unreadMessagesBorder, userNameTextBlock }
                 };
             }
         }
+
+
 
 
 
@@ -627,8 +696,8 @@ namespace ChatVrite
         private void Home_Click(object sender, RoutedEventArgs e)
         {
             PersonalWindow personalWindow = new PersonalWindow(name);
-            personalWindow.Show();
             this.Close();
+            personalWindow.Show();
         }
         private void SendMessage_Click(object sender, RoutedEventArgs e)
         {
@@ -654,11 +723,50 @@ namespace ChatVrite
             {
                 MessageBox.Show("Ошибка отправки сообщения.");
             }
-        } 
+        }
+        private void EditConditionStatusInBaseTry(bool condition)
+        {
+            try
+            {
+                EditConditionsStatusInBase(condition);
+                //MessageBox.Show($"Успешно установили статус на  {condition}!");
+
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка смены статуса. {ex}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        void EditConditionsStatusInBase(bool condition)
+        {
+            string ConditionString;
+            if (condition)
+            {
+                ConditionString = "Online";
+            }
+            else
+            {
+                ConditionString = DateTime.Now.ToString();
+            }
+            using (MySqlConnection connection = new MySqlConnection(DbConnection))
+            {
+                connection.Open();
+                string query = "UPDATE `Users` SET `Сondition` = @Condition WHERE `Users`.`Username` =@UserName";
+                using (MySqlCommand command = new MySqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@UserName", name);
+                    command.Parameters.AddWithValue("@Condition", ConditionString);
+                    command.ExecuteNonQuery();
+                }
+            }
+        }
         private void Window_Closed(object sender, EventArgs e)
         {
 
             chatUpdateTimer.Stop();
+            EditConditionStatusInBaseTry(false);
 
         }
         private void SearchTextBox_GotFocus(object sender, RoutedEventArgs e)
