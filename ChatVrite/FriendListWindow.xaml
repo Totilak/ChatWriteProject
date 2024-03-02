@@ -167,7 +167,7 @@
                 <ItemsControl Name="FriendsList">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <StackPanel Orientation="Horizontal" Margin="0,40">
+                            <StackPanel Orientation="Horizontal" Margin="0,20">
                                 <Ellipse Style="{DynamicResource EllipseStyle1}" Width="100" Height="100" Fill="{Binding ColorUser}" Margin="10,0,10,0"/>
                                 <StackPanel>
                                     <TextBlock Text="{Binding UserName}" FontSize="30" Margin="5,0,0,0" FontFamily="Montserrat bold"/>
@@ -187,7 +187,7 @@
                 <ItemsControl Name="UserList">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <StackPanel Orientation="Horizontal" Margin="0,40">
+                            <StackPanel Orientation="Horizontal" Margin="0,20">
                                 <Ellipse Style="{DynamicResource EllipseStyle1}" Width="100" Height="100" Fill="{Binding ColorUser}" Margin="10,0,10,0"/>
                                 <StackPanel>
                                     <TextBlock Text="{Binding UserName}" FontSize="30" Margin="5,0,0,0" FontFamily="Montserrat bold"/>
@@ -210,7 +210,7 @@
                     <ItemsControl Name="ReqestListToMe">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <StackPanel Orientation="Horizontal" Margin="0,40">
+                                <StackPanel Orientation="Horizontal" Margin="0,20">
                                     <Ellipse  Style="{DynamicResource EllipseStyle1}" Width="100" Height="100" Fill="{Binding ColorUser}" Margin="10,0,10,0"/>
                                     <StackPanel>
                                         <TextBlock Text="{Binding UserName}" FontSize="30" Margin="5,0,0,0" FontFamily="Montserrat bold"/>
@@ -233,7 +233,7 @@
                     <ItemsControl Name="ReqestListOnMe">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <StackPanel Orientation="Horizontal" Margin="0,40">
+                                <StackPanel Orientation="Horizontal" Margin="0,20">
                                     <Ellipse  Style="{DynamicResource EllipseStyle1}" Width="100" Height="100" Fill="{Binding ColorUser}" Margin="10,0,10,0"/>
                                     <StackPanel>
                                         <TextBlock  Text="{Binding UserName}" FontSize="30" Margin="5,0,0,0" FontFamily="Montserrat bold"/>
