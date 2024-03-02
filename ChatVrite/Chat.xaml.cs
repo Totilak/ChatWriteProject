@@ -245,12 +245,12 @@ namespace ChatVrite
 
             if (condition == "Online")
             {
-                iconBlock.Text = "\u2714"; // Галочка
+                iconBlock.Text = "●"; 
                 iconBlock.Foreground = Brushes.Green;
             }
             else
             {
-                iconBlock.Text = "\u2716"; // Крестик
+                iconBlock.Text = "●"; 
                 iconBlock.Foreground = Brushes.Red;
             }
 

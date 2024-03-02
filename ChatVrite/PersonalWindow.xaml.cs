@@ -142,5 +142,12 @@ namespace ChatVrite
         {
             EditConditionStatusInBaseTry(true);
         }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            FriendListWindow friendListWindow = new FriendListWindow(name);
+            this.Close();
+            friendListWindow.Show();
+        }
     }
 }

@@ -77,9 +77,10 @@
                     <GradientStop Color="#A8D8F3" Offset="1" />
                 </LinearGradientBrush>
             </StackPanel.Background>
-            <Button Content="Чаты" FontSize="30"  FontFamily="Montserrat bold" Margin="10,20" HorizontalAlignment="Stretch" Click="Open_Chats" Background="AliceBlue"/>
-            <Button Content="Выход" FontSize="30"  FontFamily="Montserrat bold" Margin="10,0" HorizontalAlignment="Stretch" Click="Change"  Background="AliceBlue"/>
-            <Button Content="Закрыть" FontSize="30"  FontFamily="Montserrat bold" Margin="10,20" HorizontalAlignment="Stretch" Click="Exit_Click"  Background="AliceBlue"/>
+            <Button Content="Чаты" FontSize="30"  FontFamily="Montserrat bold" Margin="10,10" HorizontalAlignment="Stretch" Click="Open_Chats" Background="AliceBlue"/>
+            <Button Content="Друзья" FontSize="30"  FontFamily="Montserrat bold" Margin="10,10" HorizontalAlignment="Stretch"  Background="AliceBlue" Click="Button_Click"/>
+            <Button Content="Выход" FontSize="30"  FontFamily="Montserrat bold" Margin="10,10" HorizontalAlignment="Stretch" Click="Change"  Background="AliceBlue"/>
+            <Button Content="Закрыть" FontSize="30"  FontFamily="Montserrat bold" Margin="10,10" HorizontalAlignment="Stretch" Click="Exit_Click"  Background="AliceBlue"/>
 
         </StackPanel>
 

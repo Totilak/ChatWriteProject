@@ -1,0 +1,269 @@
+﻿<Window x:Class="ChatVrite.FriendListWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ChatVrite"
+        mc:Ignorable="d"
+        Title="Друзья" Height="850" Width="1300" Loaded="Window_Loaded" Closed="Window_Closed"  >
+    <Window.Resources>
+
+        <Style x:Key="FocusVisual">
+            <Setter Property="Control.Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Rectangle Margin="2" StrokeDashArray="1 2" Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" SnapsToDevicePixels="true" StrokeThickness="1"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <SolidColorBrush x:Key="Button.Static.Background" Color="#FFDDDDDD"/>
+        <SolidColorBrush x:Key="Button.Static.Border" Color="#FF707070"/>
+        <SolidColorBrush x:Key="Button.MouseOver.Background" Color="#FFBEE6FD"/>
+        <SolidColorBrush x:Key="Button.MouseOver.Border" Color="#FF3C7FB1"/>
+        <SolidColorBrush x:Key="Button.Pressed.Background" Color="#FFC4E5F6"/>
+        <SolidColorBrush x:Key="Button.Pressed.Border" Color="#FF2C628B"/>
+        <SolidColorBrush x:Key="Button.Disabled.Background" Color="#FFF4F4F4"/>
+        <SolidColorBrush x:Key="Button.Disabled.Border" Color="#FFADB2B5"/>
+        <SolidColorBrush x:Key="Button.Disabled.Foreground" Color="#FF838383"/>
+        <Style x:Key="CirleBtn" TargetType="{x:Type Button}">
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
+            <Setter Property="Background" Value="{StaticResource Button.Static.Background}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource Button.Static.Border}"/>
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="1"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="border"   CornerRadius="7" Background="{TemplateBinding Background}"  BorderThickness="3" SnapsToDevicePixels="true" BorderBrush="gray">
+                            <ContentPresenter x:Name="contentPresenter" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsDefaulted" Value="true">
+                                <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter Property="Background" TargetName="border" Value="{StaticResource Button.MouseOver.Background}"/>
+                                <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource Button.MouseOver.Border}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="true">
+                                <Setter Property="Background" TargetName="border" Value="{StaticResource Button.Pressed.Background}"/>
+                                <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource Button.Pressed.Border}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Background" TargetName="border" Value="{StaticResource Button.Disabled.Background}"/>
+                                <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource Button.Disabled.Border}"/>
+                                <Setter Property="TextElement.Foreground" TargetName="contentPresenter" Value="{StaticResource Button.Disabled.Foreground}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <SolidColorBrush x:Key="TextBox.Static.Border" Color="#FFABAdB3"/>
+        <SolidColorBrush x:Key="TextBox.MouseOver.Border" Color="#FF7EB4EA"/>
+        <SolidColorBrush x:Key="TextBox.Focus.Border" Color="#FF569DE5"/>
+        <Style x:Key="TextBoxStyleCircle" TargetType="{x:Type TextBox}">
+            <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource TextBox.Static.Border}"/>
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="KeyboardNavigation.TabNavigation" Value="None"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="AllowDrop" Value="true"/>
+            <Setter Property="ScrollViewer.PanningMode" Value="VerticalFirst"/>
+            <Setter Property="Stylus.IsFlicksEnabled" Value="False"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TextBox}">
+                        <Border x:Name="border"  CornerRadius="8" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="True">
+                            <ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Opacity" TargetName="border" Value="0.56"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource TextBox.MouseOver.Border}"/>
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="true">
+                                <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource TextBox.Focus.Border}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <MultiTrigger>
+                    <MultiTrigger.Conditions>
+                        <Condition Property="IsInactiveSelectionHighlightEnabled" Value="true"/>
+                        <Condition Property="IsSelectionActive" Value="false"/>
+                    </MultiTrigger.Conditions>
+                    <Setter Property="SelectionBrush" Value="{DynamicResource {x:Static SystemColors.InactiveSelectionHighlightBrushKey}}"/>
+                </MultiTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="EllipseStyle1" TargetType="{x:Type Ellipse}">
+            <Setter Property="Stroke" Value="white" />
+            <Setter Property="StrokeThickness" Value="1" />
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Color="LightBlue" Direction="270" ShadowDepth="2" Opacity="4.5"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1"/>
+            <ColumnDefinition Width="19*"/>
+            <!-- Левая часть (1/3) -->
+            <ColumnDefinition Width="255*"/>
+            <!-- Средняя часть (1/3) -->
+            <ColumnDefinition Width="1087*"/>
+            <!-- Правая часть (1/3) -->
+        </Grid.ColumnDefinitions>
+
+
+
+
+        <!-- Левая часть (1/6 ширины) -->
+        <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3">
+            <StackPanel.Background>
+                <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
+                    <GradientStop Color="#6C85DC" Offset="0" />
+                    <GradientStop Color="#A8D8F3" Offset="1" />
+                </LinearGradientBrush>
+            </StackPanel.Background>
+            <Button Style="{DynamicResource CirleBtn}" Content="Страница" FontSize="30"  FontFamily="Montserrat bold" Margin="10,20,10,0" HorizontalAlignment="Stretch" Background="AliceBlue" Click="Home_Click" />
+            <Button Style="{DynamicResource CirleBtn}" Content="Выход" FontSize="30"  FontFamily="Montserrat bold" Margin="10,20,10,0" HorizontalAlignment="Stretch" Click="change"  Background="AliceBlue"/>
+            <Button Style="{DynamicResource CirleBtn}" Content="Закрыть" FontSize="30"  FontFamily="Montserrat bold" Margin="10,20,10,0" HorizontalAlignment="Stretch" Click="Exit_Click"  Background="AliceBlue"/>
+        </StackPanel>
+
+
+        <StackPanel Background="#BACBF8" Grid.Column="3">
+            <WrapPanel>
+                <Button Style="{DynamicResource CirleBtn}" Content="Все друзья" FontSize="30" FontFamily="Montserrat bold" Margin="10,20,10,0" HorizontalAlignment="Stretch" Background="AliceBlue" Width="200" Click="Button_Click"/>
+                <Button Style="{DynamicResource CirleBtn}" Content="Друзья онлайн" FontSize="30" FontFamily="Montserrat bold" Margin="10,20,10,0" HorizontalAlignment="Stretch" Background="AliceBlue" Width="280" Click="Button_Click_1"/>
+                <Button Style="{DynamicResource CirleBtn}" Content="Добавить друга" FontSize="30" FontFamily="Montserrat bold" Margin="10,20,10,0" HorizontalAlignment="Stretch" Background="AliceBlue" Width="280" Click="Button_Click_2"/>
+                <Button Style="{DynamicResource CirleBtn}" Content="Заявки" FontSize="30" FontFamily="Montserrat bold" Margin="10,20,10,0" HorizontalAlignment="Stretch" Background="AliceBlue" Width="150" Click="Button_Click_3" Name="reqestPageBtn"/>
+            </WrapPanel>
+
+            <!-- Поле для поиска по имени -->
+            <StackPanel Orientation="Horizontal">
+                <TextBox TextAlignment="Center" Style="{DynamicResource TextBoxStyleCircle}"  Text="Поиск по имени" Name="SearchTextBox" TextChanged="SearchTextBox_TextChanged" FontSize="26" FontFamily="Montserrat"  Width="280" Margin="10,20,10,0"  Background="AliceBlue" GotFocus="SearchTextBox_GotFocus"/>
+                <Button Style="{DynamicResource CirleBtn}" Content="X" FontSize="20" Click="CancelSearch_Click" Margin="0,20,10,0"  Background="AliceBlue" FontFamily="Montserrat bold" Width="50" Name="ClearSeacrh"/>
+                <Button Style="{DynamicResource CirleBtn}" Content="Полученные" FontSize="20" Click="Button_Click_4" Margin="10,20,10,0"  Background="AliceBlue" FontFamily="Montserrat bold" Width="150" Name="receivedBtn" Visibility="Collapsed"/>
+                <Button Style="{DynamicResource CirleBtn}" Content="Отправленные" FontSize="20" Click="Button_Click_5" Margin="0,20,10,0"  Background="AliceBlue" FontFamily="Montserrat bold" Width="200" Name="sendingBtn" Visibility="Collapsed"/>
+            </StackPanel>
+            <!-- Список друзей -->
+            <ScrollViewer VerticalScrollBarVisibility="Visible" Background="#BACBF8"  MaxHeight="650"  Name="FriendScroll">
+                <ItemsControl Name="FriendsList">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" Margin="0,40">
+                                <Ellipse Style="{DynamicResource EllipseStyle1}" Width="100" Height="100" Fill="{Binding ColorUser}" Margin="10,0,10,0"/>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding UserName}" FontSize="30" Margin="5,0,0,0" FontFamily="Montserrat bold"/>
+                                    <TextBlock Text="{Binding Condition}" FontSize="20" Margin="5,0,0,0" FontFamily="Montserrat" />
+                                    <Button Style="{DynamicResource CirleBtn}" Content="Удалить из друзей" FontSize="25" Click="RemoveFriend_Click"  Margin="5,0,0,0"  Width="300" FontFamily="Montserrat bold"  Background="AliceBlue" HorizontalAlignment="Left" Tag="{Binding UserID}" />
+                                </StackPanel>
+
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+
+
+            <!-- Список не друзей -->
+            <ScrollViewer VerticalScrollBarVisibility="Visible" Background="#BACBF8"  MaxHeight="650" Visibility="Collapsed" Name="UserScroll">
+                <ItemsControl Name="UserList">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" Margin="0,40">
+                                <Ellipse Style="{DynamicResource EllipseStyle1}" Width="100" Height="100" Fill="{Binding ColorUser}" Margin="10,0,10,0"/>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding UserName}" FontSize="30" Margin="5,0,0,0" FontFamily="Montserrat bold"/>
+                                    <TextBlock Text="{Binding Condition}" FontSize="20" Margin="5,0,0,0" FontFamily="Montserrat" />
+                                    <Button Style="{DynamicResource CirleBtn}" Content="Добавить" FontSize="25" Click="AddFriendToList_Click"  Margin="5,0,0,0"  Width="200" FontFamily="Montserrat bold"  Background="AliceBlue" HorizontalAlignment="Left" Tag="{Binding UserID}" />
+                                </StackPanel>
+
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+            </ScrollViewer>
+
+
+            <!-- Список заявок  полученые-->
+            <StackPanel Name="ReqestPaneToMeFromSenderl" Visibility="Collapsed">
+                <!-- Список заявок напревленные нам -->
+                <ScrollViewer VerticalScrollBarVisibility="Visible" Background="#BACBF8"  MaxHeight="650" >
+                    <ItemsControl Name="ReqestListToMe">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" Margin="0,40">
+                                    <Ellipse  Style="{DynamicResource EllipseStyle1}" Width="100" Height="100" Fill="{Binding ColorUser}" Margin="10,0,10,0"/>
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding UserName}" FontSize="30" Margin="5,0,0,0" FontFamily="Montserrat bold"/>
+                                        <TextBlock Text="{Binding Condition}" FontSize="20" Margin="5,0,0,0" FontFamily="Montserrat" />
+                                        <WrapPanel>
+                                            <Button Style="{DynamicResource CirleBtn}" Content="Добавить" FontSize="25" Click="AcceptReqest_Click"  Margin="5,0,0,0"  Width="200" FontFamily="Montserrat bold"  Background="AliceBlue" HorizontalAlignment="Left" Tag="{Binding RequestsID}" Height="40"/>
+                                            <Button Style="{DynamicResource CirleBtn}" Content="Отклонить" FontSize="25" Click="DeclineReqest_Click"  Margin="5,0,0,0"  Width="200" FontFamily="Montserrat bold"  Background="AliceBlue" HorizontalAlignment="Left" Tag="{Binding RequestsID}" Height="40" />
+                                        </WrapPanel>
+                                    </StackPanel>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </StackPanel>
+
+            <!-- Список заявок  отправленные-->
+            <StackPanel Name="ReqestPaneOnMeSenderl" Visibility="Collapsed">
+                <ScrollViewer VerticalScrollBarVisibility="Visible" Background="#BACBF8"  MaxHeight="650">
+                    <ItemsControl Name="ReqestListOnMe">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" Margin="0,40">
+                                    <Ellipse  Style="{DynamicResource EllipseStyle1}" Width="100" Height="100" Fill="{Binding ColorUser}" Margin="10,0,10,0"/>
+                                    <StackPanel>
+                                        <TextBlock  Text="{Binding UserName}" FontSize="30" Margin="5,0,0,0" FontFamily="Montserrat bold"/>
+                                        <TextBlock Text="{Binding Condition}" FontSize="20" Margin="5,0,0,0" FontFamily="Montserrat" />
+                                        <Button Style="{DynamicResource CirleBtn}" Content="Отозвать заявку" FontSize="25" Click="recallMyReqest_Click"  Margin="5,0,0,0"  Width="250" FontFamily="Montserrat bold"  Background="AliceBlue" HorizontalAlignment="Left" Tag="{Binding RequestsID}"  Height="40"/>
+
+                                    </StackPanel>
+
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </StackPanel>
+
+
+
+
+            <TextBlock Text="Тут пока пусто..." HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="Montserrat bold" FontSize="30" Foreground="Black"  Name="ZeroText" Visibility="Collapsed"/>
+        </StackPanel>
+
+
+
+
+
+
+
+
+
+
+
+    </Grid>
+</Window>

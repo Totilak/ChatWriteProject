@@ -114,6 +114,9 @@
       <DependentUpon>EditProfileWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="EmailService.cs" />
+    <Compile Include="FriendListWindow.xaml.cs">
+      <DependentUpon>FriendListWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Message.cs" />
     <Compile Include="PasswordHashing.cs" />
     <Compile Include="SessionManager.cs" />
@@ -126,6 +129,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="EditProfileWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FriendListWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
