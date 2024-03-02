@@ -29,7 +29,7 @@ namespace ChatVrite
     }
     public partial class Chat : Window
     {
-        private DispatcherTimer chatUpdateTimer;
+        public DispatcherTimer chatUpdateTimer;
         private DispatcherTimer timer;
         private bool hasNewMessages = false; // Флаг для определения наличия новых сообщений
         private bool isChatActive = false; // Флаг чтобы отслеживать активность чата
@@ -58,7 +58,7 @@ namespace ChatVrite
             currentUserId = GetUserIDFromName(name);
 
             chatUpdateTimer = new DispatcherTimer();
-            chatUpdateTimer.Interval = TimeSpan.FromSeconds(1); 
+            chatUpdateTimer.Interval = TimeSpan.FromSeconds(2); 
             chatUpdateTimer.Tick += ChatUpdateTimer_Tick;
             chatUpdateTimer.Start();
 
@@ -146,7 +146,10 @@ namespace ChatVrite
         }
         private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
+           // chatUpdateTimer.Interval = TimeSpan.FromSeconds(120);
+
             string searchText = SearchTextBox.Text;
+
             using (MySqlConnection connection = new MySqlConnection(DbConnection))
             {
                 connection.Open();
@@ -316,45 +319,48 @@ namespace ChatVrite
                     
                 }
             }
-            // Обновление содержимого StackPanel
-            UserButtonContainer.Items.Clear();
-            List<User> users = GetUsersFromDatabase();
-
-            Style buttonStyle = this.FindResource("btnuser") as Style;
-            foreach (User user in users)
+            if(SearchTextBox.Text =="Поиск")
             {
-                if (user.UserName == name)
-                {
+                // Обновление содержимого StackPanel
+                UserButtonContainer.Items.Clear();
+                List<User> users = GetUsersFromDatabase();
 
+                Style buttonStyle = this.FindResource("btnuser") as Style;
+                foreach (User user in users)
+                {
+                    if (user.UserName == name)
+                    {
+
+                    }
+                    else
+                    {
+                        Button userButton = new Button
+                        {
+                            Tag = user.UserID,
+                            Style = buttonStyle // Установка стиля
+                        };
+
+
+
+                        int msgCount = GetUnreadMessageCount(currentUserId, user.UserID);
+                        newMsgCount += msgCount;
+                        userButton.Content = CreateUserButtonContent(user.UserName, msgCount);
+                        userButton.Click += UserButton_Click;
+                        UserButtonContainer.Items.Add(userButton);
+                    }
+
+                }
+                if (newMsgCount > previousMsgCount)
+                {
+                    previousMsgCount = newMsgCount;
+                    player.Play();
+                    newMsgCount = 0;
                 }
                 else
                 {
-                    Button userButton = new Button
-                    {
-                        Tag = user.UserID,
-                        Style = buttonStyle // Установка стиля
-                    };
-                    
-
-
-                    int msgCount = GetUnreadMessageCount(currentUserId, user.UserID);
-                    newMsgCount += msgCount;
-                    userButton.Content = CreateUserButtonContent(user.UserName, msgCount);
-                    userButton.Click += UserButton_Click;
-                    UserButtonContainer.Items.Add(userButton);
+                    newMsgCount = 0;
                 }
-
-            }
-            if(newMsgCount>previousMsgCount)
-            {
-                previousMsgCount = newMsgCount;
-                player.Play();
-                newMsgCount = 0;
-            }
-            else
-            {
-                newMsgCount = 0;
-            }
+            }    
         }
         private void LoadChat(int receiverUserId)
         {
@@ -775,7 +781,7 @@ namespace ChatVrite
         }
         private void Canhel_Click(object sender, RoutedEventArgs e)
         {
-            SearchTextBox.Text = "";
+            SearchTextBox.Text = "Поиск";
         }
 
         private void change(object sender, RoutedEventArgs e)
