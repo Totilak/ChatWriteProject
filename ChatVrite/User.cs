@@ -21,6 +21,8 @@ namespace ChatVrite
 
         public int UnreadMessagesCount { get; set; }
 
+        public string Creatorgroup { get; set; }
+
 
 
     }

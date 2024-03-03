@@ -110,12 +110,19 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AddGroupChat.xaml.cs">
+      <DependentUpon>AddGroupChat.xaml</DependentUpon>
+    </Compile>
     <Compile Include="EditProfileWindow.xaml.cs">
       <DependentUpon>EditProfileWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="EmailService.cs" />
     <Compile Include="FriendListWindow.xaml.cs">
       <DependentUpon>FriendListWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="GroupChat.cs" />
+    <Compile Include="GroupChatWindow.xaml.cs">
+      <DependentUpon>GroupChatWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Message.cs" />
     <Compile Include="PasswordHashing.cs" />
@@ -124,6 +131,10 @@
     <Compile Include="VerificationCodeDialog.xaml.cs">
       <DependentUpon>VerificationCodeDialog.xaml</DependentUpon>
     </Compile>
+    <Page Include="AddGroupChat.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Chat.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -133,6 +144,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="FriendListWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="GroupChatWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

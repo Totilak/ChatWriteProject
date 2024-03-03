@@ -319,7 +319,7 @@ namespace ChatVrite
                     
                 }
             }
-            if(SearchTextBox.Text =="Поиск")
+            if(SearchTextBox.Text =="Поиск" && ChatScrollViewer.VerticalOffset == ChatScrollViewer.ScrollableHeight)
             {
                 // Обновление содержимого StackPanel
                 UserButtonContainer.Items.Clear();
@@ -791,6 +791,13 @@ namespace ChatVrite
             mainWindow.Show();
             this.Close();
 
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            GroupChatWindow groupChat = new GroupChatWindow(name);
+            this.Close();
+            groupChat.Show();
         }
         //%Click/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     }
