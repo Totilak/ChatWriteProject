@@ -38,7 +38,7 @@ namespace ChatVrite
                 try
                 {
                     connection.Open();
-                    string query = "SELECT UserName, Status, City, Birthday FROM Users WHERE Username = @UserName";
+                    string query = "SELECT UserName, Status, City, Birthday, Privacy FROM Users WHERE Username = @UserName";
                     using (MySqlCommand command = new MySqlCommand(query, connection))
                     {
                         command.Parameters.AddWithValue("@UserName", nameme);
@@ -51,10 +51,19 @@ namespace ChatVrite
                                 string status = reader.GetString("Status");
                                 string city = reader.GetString("City");
                                 DateTime birthday = reader.GetDateTime("Birthday");
+                                int Privacy = reader.GetInt32("Privacy");
 
                                 StatusTextBox.Text = status;
                                 CityTextBox.Text = city;
                                 BirthdayDatePicker.SelectedDate = birthday;
+                                if(Privacy == 1)
+                                {
+                                    PrivacyComboBox.SelectedIndex = 0;
+                                }
+                                else
+                                {
+                                    PrivacyComboBox.SelectedIndex = 1;
+                                }
                             }
                         }
                     }
@@ -66,6 +75,8 @@ namespace ChatVrite
             }
         }
 
+
+
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
            this.Close();
@@ -76,6 +87,11 @@ namespace ChatVrite
             string status = StatusTextBox.Text;
             string city = CityTextBox.Text;
             DateTime birthday = BirthdayDatePicker.SelectedDate.Value;
+            int PrivacyInt = 0;
+            if (PrivacyComboBox.Text == "Только друзья")
+            {
+                PrivacyInt = 1;
+            }
 
             //  Код для выполнения SQL-запроса и обновления данных в базе данных
             using (MySqlConnection connection = new MySqlConnection(DbConnection))
@@ -83,13 +99,14 @@ namespace ChatVrite
                 try
                 {
                     connection.Open();
-                    string query = "UPDATE Users SET Status = @Status, City = @City, Birthday = @Birthday WHERE Username = @UserName";
+                    string query = "UPDATE Users SET Status = @Status, City = @City, Birthday = @Birthday, Privacy = @Privacy WHERE Username = @UserName";
                     using (MySqlCommand command = new MySqlCommand(query, connection))
                     {
                         command.Parameters.AddWithValue("@Status", status);
                         command.Parameters.AddWithValue("@City", city);
                         command.Parameters.AddWithValue("@Birthday", birthday);
                         command.Parameters.AddWithValue("@UserName", nameme);
+                        command.Parameters.AddWithValue("@Privacy", PrivacyInt);
                         command.ExecuteNonQuery();
                     }
                 }

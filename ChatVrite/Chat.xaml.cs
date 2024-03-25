@@ -82,7 +82,18 @@ namespace ChatVrite
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             EditConditionStatusInBaseTry(true);
-            List<User> users = GetUsersFromDatabase();
+            List<User> users;
+
+            int thisId = GetUserIDFromName(name);
+            //Проверка приватности
+            if (CheckUserPrivacy(name))
+            {
+                users = GetUsersFromDatabaseWithPrivacy(thisId);
+            }
+            else
+            {
+                users= GetUsersFromDatabase();
+            }
 
             Style buttonStyle = this.FindResource("btnuser") as Style;
             foreach (User user in users)
@@ -105,6 +116,85 @@ namespace ChatVrite
                 }
 
             }
+        }
+
+
+        private bool CheckUserPrivacy(string name)
+        {
+            using (MySqlConnection connection = new MySqlConnection(DbConnection))
+            {
+                try
+                {
+                    connection.Open();
+                    string query = "SELECT Privacy FROM Users WHERE Username = @UserName";
+                    using (MySqlCommand command = new MySqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@UserName", name);
+
+                        using (MySqlDataReader reader = command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                int Privacy = reader.GetInt32("Privacy");
+                                if (Privacy == 1)
+                                {
+                                    return true;
+                                }
+                                else
+                                {
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+                }
+                catch (MySqlException ex)
+                {
+                    Console.WriteLine($"Ошибка при получении данных пользователя: {ex.Message}");
+                }
+            }
+
+            return false;
+        }
+
+        private List<User> GetUsersFromDatabaseWithPrivacy(int userId)
+        {
+            List<User> users = new List<User>();
+
+            using (MySqlConnection connection = new MySqlConnection(DbConnection))
+            {
+                try
+                {
+                    connection.Open();
+                    string query = @"SELECT u.UserID, u.UserName 
+                             FROM Users u
+                             INNER JOIN Friends f ON (u.UserID = f.UserID1 OR u.UserID = f.UserID2)
+                             WHERE (f.UserID1 = @userId OR f.UserID2 = @userId) AND f.Status = 'Друзья'";
+
+                    using (MySqlCommand command = new MySqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@userId", userId);
+                        using (MySqlDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                User user = new User
+                                {
+                                    UserID = reader.GetInt32("UserID"),
+                                    UserName = reader.GetString("UserName"),
+                                };
+                                users.Add(user);
+                            }
+                        }
+                    }
+                }
+                catch (MySqlException ex)
+                {
+                    Console.WriteLine($"Ошибка подключения к БД: {ex.Message}");
+                }
+            }
+
+            return users;
         }
         //%Loaded/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -146,26 +236,46 @@ namespace ChatVrite
         }
         private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-           // chatUpdateTimer.Interval = TimeSpan.FromSeconds(120);
-
             string searchText = SearchTextBox.Text;
+
+            // Флаг, указывающий, нужно ли искать только друзей
+            bool searchOnlyFriends = CheckUserPrivacy(name);
+
+
 
             using (MySqlConnection connection = new MySqlConnection(DbConnection))
             {
                 connection.Open();
 
-                string query = "SELECT UserID, UserName FROM Users WHERE UserName LIKE @searchText";
+                string query;
+                // Используем разные запросы в зависимости от значения флага searchOnlyFriends
+                if (searchOnlyFriends)
+                {
+                    query = "SELECT u.UserID, u.UserName FROM Users u " +
+                            "INNER JOIN Friends f ON (u.UserID = f.UserID1 OR u.UserID = f.UserID2) " +
+                            "WHERE (f.UserID1 = @userId OR f.UserID2 = @userId) AND f.Status = 'Друзья' " +
+                            "AND u.UserName LIKE @searchText";
+                }
+                else
+                {
+                    query = "SELECT UserID, UserName FROM Users WHERE UserName LIKE @searchText";
+                }
 
                 using (MySqlCommand command = new MySqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@searchText", "%" + searchText + "%");
+
+                    if (searchOnlyFriends)
+                    {
+                        // Подставляем значение текущего пользователя в запрос
+                        command.Parameters.AddWithValue("@userId", currentUserId);
+                    }
 
                     using (MySqlDataReader reader = command.ExecuteReader())
                     {
                         if (UserButtonContainer != null)
                         {
                             UserButtonContainer.Items.Clear();
-
                         }
 
                         while (reader.Read())
@@ -175,29 +285,25 @@ namespace ChatVrite
 
                             if (userName == name)
                             {
-
+                                continue; // Пропускаем текущего пользователя
                             }
-                            else
+
+                            Button userButton = new Button
                             {
+                                Tag = userId,
+                                Style = FindResource("btnuser") as Style
+                            };
+                            int msgCount = GetUnreadMessageCount(currentUserId, userId);
+                            userButton.Content = CreateUserButtonContent(userName, msgCount);
 
-                                Button userButton = new Button
-                                {
-                                    Tag = userId,
-                                    Style = FindResource("btnuser") as Style
-                                };
-                                int msgCount = GetUnreadMessageCount(currentUserId, userId);
-                                userButton.Content = CreateUserButtonContent(userName, msgCount);
-
-
-                                userButton.Click += UserButton_Click;
-                                UserButtonContainer.Items.Add(userButton);
-                            }
-
+                            userButton.Click += UserButton_Click;
+                            UserButtonContainer.Items.Add(userButton);
                         }
                     }
                 }
             }
         }
+
         string GetConditionFromBD(string usrname)
         {
             try
@@ -319,11 +425,22 @@ namespace ChatVrite
                     
                 }
             }
-            if(SearchTextBox.Text =="Поиск")
+            if(SearchTextBox.Text =="Поиск" && ChatScrollViewer.VerticalOffset == ChatScrollViewer.ScrollableHeight)
             {
                 // Обновление содержимого StackPanel
                 UserButtonContainer.Items.Clear();
-                List<User> users = GetUsersFromDatabase();
+
+                List<User> users;
+                int thisId = GetUserIDFromName(name);
+                //Проверка приватности
+                if (CheckUserPrivacy(name))
+                {
+                    users = GetUsersFromDatabaseWithPrivacy(thisId);
+                }
+                else
+                {
+                    users = GetUsersFromDatabase();
+                }
 
                 Style buttonStyle = this.FindResource("btnuser") as Style;
                 foreach (User user in users)
@@ -791,6 +908,13 @@ namespace ChatVrite
             mainWindow.Show();
             this.Close();
 
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            GroupChatWindow groupChat = new GroupChatWindow(name);
+            this.Close();
+            groupChat.Show();
         }
         //%Click/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     }

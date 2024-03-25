@@ -84,6 +84,7 @@
             <TextBlock Text="Статус:" VerticalAlignment="Center" Margin="5" FontSize="30" FontFamily="Montserrat bold" />
             <TextBlock Text="Город:" Grid.Row="1" VerticalAlignment="Center" Margin="5,9" FontSize="30" FontFamily="Montserrat bold"/>
             <TextBlock Text="Дата рождения:" Grid.Row="2" VerticalAlignment="Center" Margin="5,6" FontSize="30" FontFamily="Montserrat bold"/>
+            <TextBlock Text="Приватность:" Grid.Row="3" VerticalAlignment="Center" Margin="5,6" FontSize="30" FontFamily="Montserrat bold"/>
         </Grid>
 
         <Grid Grid.Column="1" Background="AliceBlue">
@@ -97,8 +98,13 @@
             <TextBox x:Name="StatusTextBox" Grid.Row="0"  Margin="5" FontSize="30" FontFamily="Montserrat bold"/>
             <TextBox x:Name="CityTextBox" Grid.Row="1"  Margin="5" FontSize="30" FontFamily="Montserrat bold"/>
             <DatePicker x:Name="BirthdayDatePicker" Grid.Row="2" Margin="5" FontSize="30" FontFamily="Montserrat bold"/>
+            <ComboBox x:Name="PrivacyComboBox" Grid.Row="3"  Margin="5" FontSize="30" FontFamily="Montserrat bold" Background="White">
+                <ComboBoxItem>Только друзья</ComboBoxItem>
+                <ComboBoxItem>Все</ComboBoxItem>
+            </ComboBox>
 
-            <Button Style="{DynamicResource btngh}" Content="Сохранить" Click="SaveButton_Click" Grid.Row="3" HorizontalAlignment="Left" Margin="295,0,0,-164"  FontSize="20" FontFamily="Montserrat bold" Width="200" Height="50" VerticalAlignment="Bottom"/>
+
+            <Button Style="{DynamicResource btngh}" Content="Сохранить" Click="SaveButton_Click" Grid.Row="3" HorizontalAlignment="Left" Margin="294,0,0,-100"  FontSize="20" FontFamily="Montserrat bold" Width="200" Height="50" VerticalAlignment="Bottom"/>
         </Grid>
 
         <Button Style="{DynamicResource btngh}" Content="Назад" Click="BackButton_Click" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="294,0,0,27" FontSize="20" FontFamily="Montserrat bold" Width="200" Height="50" Grid.Column="1"/>

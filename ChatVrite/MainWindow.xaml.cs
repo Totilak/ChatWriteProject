@@ -322,5 +322,11 @@ namespace ChatVrite
                 }
             }
         }
+
+        private void Label_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            RecoveryPasswordWindow recoveryPasswordWindow = new RecoveryPasswordWindow();
+            recoveryPasswordWindow.ShowDialog();
+        }
     }
 }

@@ -332,6 +332,7 @@
                         <TextBlock Text="Пароль" FontSize="30" FontFamily="Montserrat bold"/>
                         <PasswordBox x:Name="LoginPassword" FontSize="30" Margin="0 5 0 10"/>
                         <Button Style="{DynamicResource ButtonRad}" Content="Войти" FontSize="50" Background="AliceBlue" Click="Login_Click" HorizontalAlignment="Center" Margin="0 60"/>
+                        <Label  Content="Забыли пароль?" HorizontalAlignment="Center" FontFamily="Montserrat bold" FontSize="20" Foreground="#FF3939A4" MouseLeftButtonDown="Label_MouseLeftButtonDown" />
                     </StackPanel>
                 </Border>
             </TabItem>
@@ -366,7 +367,7 @@
                     </LinearGradientBrush>
                 </TabItem.Background>
                 <Border Margin="20" Background="White" CornerRadius="0, 10, 10, 0">
-                    <!-- Ваш контент для вкладки "Выход" -->
+              
                 </Border>
             </TabItem>
         </TabControl>
