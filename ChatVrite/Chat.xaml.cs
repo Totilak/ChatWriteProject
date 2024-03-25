@@ -896,7 +896,7 @@ namespace ChatVrite
         }
         private void Window_Closed(object sender, EventArgs e)
         {
-
+            isChatActive=false;
             chatUpdateTimer.Stop();
             EditConditionStatusInBaseTry(false);
 
@@ -912,6 +912,7 @@ namespace ChatVrite
 
         private void change(object sender, RoutedEventArgs e)
         {
+            isChatActive = false;
             SessionManager.ClearUserData(); // Очистка данных о пользователе при выходе
             MainWindow mainWindow = new MainWindow();
             mainWindow.Show();
