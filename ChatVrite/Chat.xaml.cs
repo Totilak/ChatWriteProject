@@ -82,18 +82,8 @@ namespace ChatVrite
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             EditConditionStatusInBaseTry(true);
-            List<User> users;
+            List<User> users = GetUsersFromDatabase();
 
-            int thisId = GetUserIDFromName(name);
-            //Проверка приватности
-            if (CheckUserPrivacy(name))
-            {
-                users = GetUsersFromDatabaseWithPrivacy(thisId);
-            }
-            else
-            {
-                users= GetUsersFromDatabase();
-            }
 
             Style buttonStyle = this.FindResource("btnuser") as Style;
             foreach (User user in users)
@@ -102,17 +92,41 @@ namespace ChatVrite
                 {
 
                 }
+                else if(user.Privacy==1)
+                {
+                   if(AreFriends(currentUserId, user.UserID))
+                    {
+                        Button userButton = new Button
+                        {
+                            Tag = user.UserID,
+                            Style = buttonStyle // Установка стиля
+                        };
+                        int msgCount = GetUnreadMessageCount(currentUserId, user.UserID);
+                        userButton.Content = CreateUserButtonContent(user.UserName, msgCount);
+                        userButton.Click += UserButton_Click;
+                        UserButtonContainer.Items.Add(userButton);
+                    }
+                    else
+                    {
+
+                    }
+
+                }
                 else
                 {
-                    Button userButton = new Button
+                    if((AreFriends(currentUserId, user.UserID)))
                     {
-                        Tag = user.UserID,
-                        Style = buttonStyle // Установка стиля
-                    };
-                    int msgCount = GetUnreadMessageCount(currentUserId, user.UserID);
-                    userButton.Content = CreateUserButtonContent(user.UserName, msgCount);
-                    userButton.Click += UserButton_Click;
-                    UserButtonContainer.Items.Add(userButton);
+                        Button userButton = new Button
+                        {
+                            Tag = user.UserID,
+                            Style = buttonStyle // Установка стиля
+                        };
+                        int msgCount = GetUnreadMessageCount(currentUserId, user.UserID);
+                        userButton.Content = CreateUserButtonContent(user.UserName, msgCount);
+                        userButton.Click += UserButton_Click;
+                        UserButtonContainer.Items.Add(userButton);
+                    }
+                   
                 }
 
             }
@@ -157,45 +171,39 @@ namespace ChatVrite
             return false;
         }
 
-        private List<User> GetUsersFromDatabaseWithPrivacy(int userId)
+
+
+        private bool AreFriends(int userId1, int userId2)
         {
-            List<User> users = new List<User>();
+            bool areFriends = false;
 
             using (MySqlConnection connection = new MySqlConnection(DbConnection))
             {
-                try
-                {
-                    connection.Open();
-                    string query = @"SELECT u.UserID, u.UserName 
-                             FROM Users u
-                             INNER JOIN Friends f ON (u.UserID = f.UserID1 OR u.UserID = f.UserID2)
-                             WHERE (f.UserID1 = @userId OR f.UserID2 = @userId) AND f.Status = 'Друзья'";
+                connection.Open();
 
-                    using (MySqlCommand command = new MySqlCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@userId", userId);
-                        using (MySqlDataReader reader = command.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                User user = new User
-                                {
-                                    UserID = reader.GetInt32("UserID"),
-                                    UserName = reader.GetString("UserName"),
-                                };
-                                users.Add(user);
-                            }
-                        }
-                    }
-                }
-                catch (MySqlException ex)
+                string query = "SELECT COUNT(*) FROM Friends " +
+                               "WHERE ((UserID1 = @userId1 AND UserID2 = @userId2) OR (UserID1 = @userId2 AND UserID2 = @userId1)) " +
+                               "AND Status = 'Друзья'";
+
+                using (MySqlCommand command = new MySqlCommand(query, connection))
                 {
-                    Console.WriteLine($"Ошибка подключения к БД: {ex.Message}");
+                    command.Parameters.AddWithValue("@userId1", userId1);
+                    command.Parameters.AddWithValue("@userId2", userId2);
+
+                    // Выполняем запрос и получаем количество строк, которое соответствует критериям
+                    int count = Convert.ToInt32(command.ExecuteScalar());
+
+                    // Если количество строк больше 0, значит, пользователи являются друзьями
+                    if (count > 0)
+                    {
+                        areFriends = true;
+                    }
                 }
             }
 
-            return users;
+            return areFriends;
         }
+
         //%Loaded/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -238,38 +246,16 @@ namespace ChatVrite
         {
             string searchText = SearchTextBox.Text;
 
-            // Флаг, указывающий, нужно ли искать только друзей
-            bool searchOnlyFriends = CheckUserPrivacy(name);
-
-
 
             using (MySqlConnection connection = new MySqlConnection(DbConnection))
             {
                 connection.Open();
 
-                string query;
-                // Используем разные запросы в зависимости от значения флага searchOnlyFriends
-                if (searchOnlyFriends)
-                {
-                    query = "SELECT u.UserID, u.UserName FROM Users u " +
-                            "INNER JOIN Friends f ON (u.UserID = f.UserID1 OR u.UserID = f.UserID2) " +
-                            "WHERE (f.UserID1 = @userId OR f.UserID2 = @userId) AND f.Status = 'Друзья' " +
-                            "AND u.UserName LIKE @searchText";
-                }
-                else
-                {
-                    query = "SELECT UserID, UserName FROM Users WHERE UserName LIKE @searchText";
-                }
+                string query = "SELECT UserID, UserName,Privacy FROM Users WHERE UserName LIKE @searchText";
 
                 using (MySqlCommand command = new MySqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@searchText", "%" + searchText + "%");
-
-                    if (searchOnlyFriends)
-                    {
-                        // Подставляем значение текущего пользователя в запрос
-                        command.Parameters.AddWithValue("@userId", currentUserId);
-                    }
 
                     using (MySqlDataReader reader = command.ExecuteReader())
                     {
@@ -282,10 +268,20 @@ namespace ChatVrite
                         {
                             int userId = reader.GetInt32("UserID");
                             string userName = reader.GetString("UserName");
+                            int Privacy = reader.GetInt32("Privacy");
 
                             if (userName == name)
                             {
                                 continue; // Пропускаем текущего пользователя
+                            }
+
+                            if (Privacy ==1)
+                            {
+                                // Проверяем, являются ли пользователи друзьями, если Privacy установлено в 1
+                                if (!AreFriends(currentUserId, userId))
+                                {
+                                    continue; // Пропускаем пользователя, если он не в друзьях
+                                }
                             }
 
                             Button userButton = new Button
@@ -303,6 +299,7 @@ namespace ChatVrite
                 }
             }
         }
+
 
         string GetConditionFromBD(string usrname)
         {
@@ -430,17 +427,7 @@ namespace ChatVrite
                 // Обновление содержимого StackPanel
                 UserButtonContainer.Items.Clear();
 
-                List<User> users;
-                int thisId = GetUserIDFromName(name);
-                //Проверка приватности
-                if (CheckUserPrivacy(name))
-                {
-                    users = GetUsersFromDatabaseWithPrivacy(thisId);
-                }
-                else
-                {
-                    users = GetUsersFromDatabase();
-                }
+                List<User> users=GetUsersFromDatabase();
 
                 Style buttonStyle = this.FindResource("btnuser") as Style;
                 foreach (User user in users)
@@ -449,22 +436,43 @@ namespace ChatVrite
                     {
 
                     }
+                    else if (user.Privacy == 1)
+                    {
+                        if (AreFriends(currentUserId, user.UserID))
+                        {
+                            Button userButton = new Button
+                            {
+                                Tag = user.UserID,
+                                Style = buttonStyle // Установка стиля
+                            };
+                            int msgCount = GetUnreadMessageCount(currentUserId, user.UserID);
+                            userButton.Content = CreateUserButtonContent(user.UserName, msgCount);
+                            userButton.Click += UserButton_Click;
+                            UserButtonContainer.Items.Add(userButton);
+                        }
+                        else
+                        {
+
+                        }
+
+                    }
                     else
                     {
-                        Button userButton = new Button
+                        if ((AreFriends(currentUserId, user.UserID)))
                         {
-                            Tag = user.UserID,
-                            Style = buttonStyle // Установка стиля
-                        };
+                            Button userButton = new Button
+                            {
+                                Tag = user.UserID,
+                                Style = buttonStyle // Установка стиля
+                            };
+                            int msgCount = GetUnreadMessageCount(currentUserId, user.UserID);
+                            userButton.Content = CreateUserButtonContent(user.UserName, msgCount);
+                            userButton.Click += UserButton_Click;
+                            UserButtonContainer.Items.Add(userButton);
+                        }
 
-
-
-                        int msgCount = GetUnreadMessageCount(currentUserId, user.UserID);
-                        newMsgCount += msgCount;
-                        userButton.Content = CreateUserButtonContent(user.UserName, msgCount);
-                        userButton.Click += UserButton_Click;
-                        UserButtonContainer.Items.Add(userButton);
                     }
+
 
                 }
                 if (newMsgCount > previousMsgCount)
@@ -667,7 +675,7 @@ namespace ChatVrite
                 try
                 {
                     connection.Open();
-                    using (MySqlCommand command = new MySqlCommand("SELECT UserID, UserName FROM Users", connection))
+                    using (MySqlCommand command = new MySqlCommand("SELECT UserID, UserName, 	Privacy FROM Users", connection))
                     using (MySqlDataReader reader = command.ExecuteReader())
                     {
                         while (reader.Read())
@@ -676,6 +684,7 @@ namespace ChatVrite
                             {
                                 UserID = reader.GetInt32("UserID"),
                                 UserName = reader.GetString("UserName"),
+                                Privacy = reader.GetInt32("Privacy")
                             };
                             users.Add(user);
                         }

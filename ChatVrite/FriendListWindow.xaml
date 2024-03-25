@@ -157,7 +157,7 @@
 
             <!-- Поле для поиска по имени -->
             <StackPanel Orientation="Horizontal">
-                <TextBox TextAlignment="Center" Style="{DynamicResource TextBoxStyleCircle}"  Text="Поиск по имени" Name="SearchTextBox" TextChanged="SearchTextBox_TextChanged" FontSize="26" FontFamily="Montserrat"  Width="280" Margin="10,20,10,0"  Background="AliceBlue" GotFocus="SearchTextBox_GotFocus"/>
+                <TextBox TextAlignment="Center" Style="{DynamicResource TextBoxStyleCircle}"  Text="Поиск по имени" Name="SearchTextBox" TextChanged="SearchTextBox_TextChanged" FontSize="26" FontFamily="Montserrat"  Width="280" Margin="10,20,10,0"  Background="AliceBlue" GotFocus="SearchTextBox_GotFocus" />
                 <Button Style="{DynamicResource CirleBtn}" Content="X" FontSize="20" Click="CancelSearch_Click" Margin="0,20,10,0"  Background="AliceBlue" FontFamily="Montserrat bold" Width="50" Name="ClearSeacrh"/>
                 <Button Style="{DynamicResource CirleBtn}" Content="Полученные" FontSize="20" Click="Button_Click_4" Margin="10,20,10,0"  Background="AliceBlue" FontFamily="Montserrat bold" Width="150" Name="receivedBtn" Visibility="Collapsed"/>
                 <Button Style="{DynamicResource CirleBtn}" Content="Отправленные" FontSize="20" Click="Button_Click_5" Margin="0,20,10,0"  Background="AliceBlue" FontFamily="Montserrat bold" Width="200" Name="sendingBtn" Visibility="Collapsed"/>
@@ -168,7 +168,7 @@
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal" Margin="0,20">
-                                <Ellipse Style="{DynamicResource EllipseStyle1}" Width="100" Height="100" Fill="{Binding ColorUser}" Margin="10,0,10,0"/>
+                                <Ellipse Style="{DynamicResource EllipseStyle1}" Width="100" Height="100" Fill="{Binding ColorUser}" Margin="10,0,10,0" />
                                 <StackPanel>
                                     <TextBlock Text="{Binding UserName}" FontSize="30" Margin="5,0,0,0" FontFamily="Montserrat bold"/>
                                     <TextBlock Text="{Binding Condition}" FontSize="20" Margin="5,0,0,0" FontFamily="Montserrat" />

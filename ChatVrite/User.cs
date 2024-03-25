@@ -19,6 +19,8 @@ namespace ChatVrite
         public int RequestsID { get; set; }
         public SolidColorBrush ColorUser { get; set; }
 
+        public int Privacy { get; set; }
+
         public int UnreadMessagesCount { get; set; }
 
         public string Creatorgroup { get; set; }
